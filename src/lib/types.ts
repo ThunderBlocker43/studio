@@ -12,9 +12,12 @@ export type Listing = {
     bedrooms: number;
     bathrooms: number;
     area: number; 
+    petsAllowed: boolean;
+    couplesAllowed: boolean;
   };
   image: string;
   type: 'Apartment' | 'House' | 'Studio';
+  sourceUrl: string;
 };
 
 export type School = {
