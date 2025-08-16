@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
     Bath, BedDouble, Dog, ExternalLink, MapPin, Ruler, Users, 
-    Sofa, ClipboardSignature, Leaf, Wifi, WashingMachine, Snowflake, Check, X, PiggyBank, FileText
+    Sofa, ClipboardSignature, Leaf, PiggyBank, FileText
 } from 'lucide-react';
 import { formatPrice, generateSlug } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -23,6 +23,24 @@ export default function ListingPage({ params }: { params: { id:string } }) {
   if (!listing) {
     notFound();
   }
+
+  const PriceAndDeposit = () => (
+    <div className='space-y-2'>
+        <div>
+            <p className="text-2xl font-bold text-primary">{formatPrice(listing.price)}</p>
+            <p className="text-sm font-normal text-muted-foreground">/month (excl. utilities)</p>
+        </div>
+        {listing.details.deposit && (
+             <div className='flex items-center gap-2 text-sm'>
+                <PiggyBank className="h-4 w-4 text-muted-foreground"/>
+                <span className='text-muted-foreground'>Deposit:</span>
+                <span className="font-medium text-foreground">
+                    {formatPrice(listing.details.deposit)}
+                </span>
+            </div>
+        )}
+    </div>
+  );
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -42,8 +60,7 @@ export default function ListingPage({ params }: { params: { id:string } }) {
             </Card>
             
             <div className='p-4 -mt-8 bg-background rounded-lg shadow-md mb-8 lg:hidden'>
-                 <p className="text-2xl font-bold text-primary">{formatPrice(listing.price)}</p>
-                 <p className="text-sm font-normal text-muted-foreground">/month (excl. utilities)</p>
+                 <PriceAndDeposit />
             </div>
 
              <Card>
@@ -137,21 +154,11 @@ export default function ListingPage({ params }: { params: { id:string } }) {
             <Card>
                 <CardContent className="p-6 space-y-4">
                      <div className='hidden lg:block'>
-                        <p className="text-2xl font-bold text-primary">{formatPrice(listing.price)}</p>
-                        <p className="text-sm font-normal text-muted-foreground">/month</p>
+                        <PriceAndDeposit />
                     </div>
                     <Separator className='hidden lg:block'/>
                      <div className="space-y-3">
                         <h4 className="font-semibold text-md">Additional Costs</h4>
-                        <div className='flex items-center justify-between text-sm'>
-                            <div className='flex items-center gap-2 text-muted-foreground'>
-                                <PiggyBank className="h-4 w-4"/>
-                                <span>Deposit</span>
-                            </div>
-                            <span className="font-medium text-foreground">
-                                {listing.details.deposit ? formatPrice(listing.details.deposit) : 'N/A'}
-                            </span>
-                        </div>
                         <div className='flex items-center justify-between text-sm'>
                             <div className='flex items-center gap-2 text-muted-foreground'>
                                 <FileText className="h-4 w-4"/>
