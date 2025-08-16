@@ -8,22 +8,24 @@ import { schools } from '@/data/schools';
 import type { FiltersState, School } from '@/lib/types';
 import { formatPrice } from '@/lib/utils';
 import { Filter, GraduationCap, ListFilter, School as SchoolIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface FiltersProps {
   filters: FiltersState;
   setFilters: Dispatch<SetStateAction<FiltersState>>;
   minPrice: number;
   maxPrice: number;
+  disabled?: boolean;
 }
 
-export function Filters({ filters, setFilters, minPrice, maxPrice }: FiltersProps) {
+export function Filters({ filters, setFilters, minPrice, maxPrice, disabled = false }: FiltersProps) {
   const handleSchoolChange = (schoolName: string) => {
     const school = schools.find(s => s.name === schoolName) || null;
     setFilters(prev => ({ ...prev, selectedSchool: school }));
   };
 
   return (
-    <>
+    <div className={cn(disabled && "opacity-50 pointer-events-none")}>
       <div className="space-y-4">
         <h2 className="text-xl font-semibold font-headline flex items-center gap-2">
           <Filter className="h-5 w-5" />
@@ -35,6 +37,7 @@ export function Filters({ filters, setFilters, minPrice, maxPrice }: FiltersProp
           <Select
             value={filters.sortBy}
             onValueChange={value => setFilters(prev => ({ ...prev, sortBy: value }))}
+            disabled={disabled}
           >
             <SelectTrigger id="sort-by" className="w-full">
               <SelectValue placeholder="Sort listings..." />
@@ -60,11 +63,12 @@ export function Filters({ filters, setFilters, minPrice, maxPrice }: FiltersProp
             max={maxPrice}
             step={50}
             className="mt-4"
+            disabled={disabled}
           />
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-4 mt-8">
         <h2 className="text-xl font-semibold font-headline flex items-center gap-2">
           <ListFilter className="h-5 w-5" />
           Preferences
@@ -75,6 +79,7 @@ export function Filters({ filters, setFilters, minPrice, maxPrice }: FiltersProp
           <Select
             value={filters.suitability}
             onValueChange={value => setFilters(prev => ({ ...prev, suitability: value as FiltersState['suitability'] }))}
+            disabled={disabled}
           >
             <SelectTrigger id="suitability" className="w-full">
               <SelectValue placeholder="Select suitability..." />
@@ -89,7 +94,7 @@ export function Filters({ filters, setFilters, minPrice, maxPrice }: FiltersProp
 
         <div className="space-y-2">
           <Label htmlFor="school">Find near a school</Label>
-          <Select onValueChange={handleSchoolChange}>
+          <Select onValueChange={handleSchoolChange} disabled={disabled}>
             <SelectTrigger id="school" className="w-full">
                 <div className='flex items-center gap-2'>
                     <GraduationCap className='h-4 w-4 text-muted-foreground'/>
@@ -106,6 +111,6 @@ export function Filters({ filters, setFilters, minPrice, maxPrice }: FiltersProp
           </Select>
         </div>
       </div>
-    </>
+    </div>
   );
 }

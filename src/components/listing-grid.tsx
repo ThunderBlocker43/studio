@@ -1,24 +1,27 @@
 
 'use client';
 
-import type { CategorizeListingOutput } from '@/ai/flows/categorize-listing';
+import type { ScrapedListing } from '@/ai/flows/scrape-and-categorize';
 import { ListingCard } from '@/components/listing-card';
-import type { FiltersState, Listing } from '@/lib/types';
+import type { FiltersState } from '@/lib/types';
 import { getDistance } from '@/lib/utils';
 import { useMemo } from 'react';
 import { Skeleton } from './ui/skeleton';
 
 interface ListingGridProps {
-  listings: Listing[];
+  listings: ScrapedListing[];
   filters: FiltersState;
-  categories: Map<string, CategorizeListingOutput>;
-  isLoadingCategories: boolean;
+  isLoading: boolean;
 }
 
 const SCHOOL_RADIUS_KM = 2.5;
 
-export function ListingGrid({ listings, filters, categories, isLoadingCategories }: ListingGridProps) {
+export function ListingGrid({ listings, filters, isLoading }: ListingGridProps) {
   const filteredAndSortedListings = useMemo(() => {
+    if (isLoading) {
+        return [];
+    }
+
     let result = [...listings];
 
     // Filter by price
@@ -38,11 +41,8 @@ export function ListingGrid({ listings, filters, categories, isLoadingCategories
     }
 
     // Filter by suitability
-    if (filters.suitability !== 'all' && !isLoadingCategories) {
-      result = result.filter(l => {
-        const category = categories.get(l.id);
-        return category?.suitability === filters.suitability;
-      });
+    if (filters.suitability !== 'all') {
+      result = result.filter(l => l.category.suitability === filters.suitability);
     }
 
     // Sort
@@ -55,34 +55,30 @@ export function ListingGrid({ listings, filters, categories, isLoadingCategories
     }
 
     return result;
-  }, [listings, filters, categories, isLoadingCategories]);
+  }, [listings, filters, isLoading]);
   
   return (
     <div className="flex-1 px-6 pb-6">
-       {filteredAndSortedListings.length > 0 ? (
+       {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
+                {Array.from({ length: 8 }).map((_, i) => (
+                    <ListingCard key={i} listing={{} as ScrapedListing} isLoading={true} />
+                ))}
+            </div>
+       ) : filteredAndSortedListings.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
             {filteredAndSortedListings.map((listing) => (
             <ListingCard
                 key={listing.id}
                 listing={listing}
-                category={categories.get(listing.id) || null}
-                isLoading={isLoadingCategories}
+                isLoading={false}
             />
             ))}
         </div>
         ) : (
             <div className="flex flex-col items-center justify-center h-full text-center py-16">
-                 {isLoadingCategories ? (
-                    <div className="space-y-2">
-                        <Skeleton className="h-6 w-48" />
-                        <Skeleton className="h-4 w-64" />
-                    </div>
-                ) : (
-                    <>
-                        <h3 className="text-xl font-semibold">No Listings Found</h3>
-                        <p className="text-muted-foreground mt-2">Try adjusting your filters to find more homes.</p>
-                    </>
-                )}
+                <h3 className="text-xl font-semibold">No Listings Found</h3>
+                <p className="text-muted-foreground mt-2">Try adjusting your filters to find more homes.</p>
             </div>
         )}
     </div>

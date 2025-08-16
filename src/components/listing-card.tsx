@@ -12,10 +12,10 @@ import { cn, formatPrice, generateSlug } from '@/lib/utils';
 import { Bath, BedDouble, Heart, Home, Info, MapPin, Ruler, University } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import type { ScrapedListing } from '@/ai/flows/scrape-and-categorize';
 
 interface ListingCardProps {
-  listing: Listing;
-  category: CategorizeListingOutput | null;
+  listing: ScrapedListing;
   isLoading: boolean;
 }
 
@@ -41,7 +41,7 @@ function SuitabilityBadge({ suitability }: { suitability: CategorizeListingOutpu
 }
 
 
-export function ListingCard({ listing, category, isLoading }: ListingCardProps) {
+export function ListingCard({ listing, isLoading }: ListingCardProps) {
   const { savedListingIds, toggleSaveListing } = useSavedListings();
   
   const isSaved = savedListingIds.has(listing.id);
@@ -53,6 +53,35 @@ export function ListingCard({ listing, category, isLoading }: ListingCardProps) 
   }
 
   const slug = generateSlug(listing.location.address);
+
+  if (isLoading) {
+    return (
+        <Card className="flex flex-col h-full overflow-hidden">
+            <CardHeader className="p-0 relative">
+                <Skeleton className="w-full h-48" />
+            </CardHeader>
+            <CardContent className="p-4 flex-1 flex flex-col">
+                 <Skeleton className="h-5 w-32 mb-2" />
+                 <Skeleton className="h-5 w-5/6 mb-1" />
+                 <Skeleton className="h-4 w-4/6 mb-3" />
+                 <div className="flex items-center space-x-4 mb-4">
+                    <Skeleton className="h-4 w-8" />
+                    <Skeleton className="h-4 w-8" />
+                    <Skeleton className="h-4 w-8" />
+                 </div>
+                 <div className="space-y-1.5 flex-1">
+                    <Skeleton className="h-2 w-full" />
+                    <Skeleton className="h-2 w-full" />
+                    <Skeleton className="h-2 w-5/6" />
+                </div>
+            </CardContent>
+            <CardFooter className="p-4 bg-secondary/30 flex justify-between items-center">
+                 <Skeleton className="h-6 w-24" />
+                 <Skeleton className="h-8 w-8 rounded-full" />
+            </CardFooter>
+        </Card>
+    )
+  }
 
   return (
     <Link href={`/listing/${slug}`} className="block h-full">
@@ -69,7 +98,7 @@ export function ListingCard({ listing, category, isLoading }: ListingCardProps) 
         </CardHeader>
         <CardContent className="p-4 flex-1 flex flex-col">
             <div className="flex justify-between items-start gap-2 mb-2">
-                {isLoading ? <Skeleton className="h-5 w-32" /> : category && <SuitabilityBadge suitability={category.suitability} />}
+                <SuitabilityBadge suitability={listing.category.suitability} />
             </div>
             <CardTitle className="text-lg font-headline font-semibold mb-1 leading-tight">{listing.title}</CardTitle>
             <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
@@ -91,13 +120,7 @@ export function ListingCard({ listing, category, isLoading }: ListingCardProps) 
             </div>
             </div>
             <div className="text-xs text-muted-foreground italic flex-1">
-                {isLoading ? (
-                <div className="space-y-1.5">
-                    <Skeleton className="h-2 w-full" />
-                    <Skeleton className="h-2 w-full" />
-                    <Skeleton className="h-2 w-5/6" />
-                </div>
-                ) : category?.reason}
+               {listing.category.reason}
             </div>
         </CardContent>
         <CardFooter className="p-4 bg-secondary/30 flex justify-between items-center">

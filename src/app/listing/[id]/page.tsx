@@ -16,9 +16,17 @@ import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
 import { AmenityIcon } from '@/components/amenity-icon';
 
+// This is a fallback for displaying static listings if the scraper fails or for direct links.
+// In a real application, this would fetch a single listing by ID from a database.
+const allMockListings = [
+    ...allListings
+    // In a real app, you would also import your mock scraping data here.
+    // For now, we rely on the main listings data for detail pages.
+]
+
 export default function ListingPage({ params }: { params: { id:string } }) {
   const { id } = React.use(params);
-  const listing = allListings.find(l => generateSlug(l.location.address) === id);
+  const listing = allMockListings.find(l => generateSlug(l.location.address) === id);
 
   if (!listing) {
     notFound();
