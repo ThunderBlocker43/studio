@@ -5,13 +5,13 @@ import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Bath, BedDouble, MapPin, Ruler } from 'lucide-react';
-import { formatPrice } from '@/lib/utils';
+import { formatPrice, generateSlug } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import React from 'react';
 
 export default function ListingPage({ params }: { params: { id: string } }) {
   const { id } = React.use(params);
-  const listing = allListings.find(l => l.id === id);
+  const listing = allListings.find(l => generateSlug(l.location.address) === id);
 
   if (!listing) {
     notFound();

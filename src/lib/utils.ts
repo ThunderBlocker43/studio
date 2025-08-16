@@ -29,3 +29,22 @@ export function getDistance(lat1: number, lon1: number, lat2: number, lon2: numb
   const d = R * c; // Distance in km
   return d;
 }
+
+export function generateSlug(address: string): string {
+    const parts = address.split(',');
+    if (parts.length < 2) return '';
+
+    const streetAndNumber = parts[0].trim();
+    const postcodePart = parts[1].trim();
+
+    const numberMatch = streetAndNumber.match(/\d+[a-zA-Z]*$/);
+    const houseNumber = numberMatch ? numberMatch[0] : '';
+
+    const postcodeMatch = postcodePart.match(/\d{4}\s?[a-zA-Z]{2}/);
+    const postcode = postcodeMatch ? postcodeMatch[0].replace(/\s/g, '').toLowerCase() : '';
+
+    if (postcode && houseNumber) {
+        return `${postcode}-${houseNumber}`;
+    }
+    return '';
+}

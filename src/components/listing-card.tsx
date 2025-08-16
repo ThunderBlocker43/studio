@@ -8,7 +8,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSavedListings } from '@/hooks/use-saved-listings';
 import type { Listing } from '@/lib/types';
-import { cn, formatPrice } from '@/lib/utils';
+import { cn, formatPrice, generateSlug } from '@/lib/utils';
 import { Bath, BedDouble, Heart, Home, Info, MapPin, Ruler, University } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -52,8 +52,10 @@ export function ListingCard({ listing, category, isLoading }: ListingCardProps) 
     toggleSaveListing(listing.id);
   }
 
+  const slug = generateSlug(listing.location.address);
+
   return (
-    <Link href={`/listing/${listing.id}`} className="block h-full">
+    <Link href={`/listing/${slug}`} className="block h-full">
         <Card className="flex flex-col h-full overflow-hidden transition-all hover:shadow-lg">
         <CardHeader className="p-0 relative">
             <Image
