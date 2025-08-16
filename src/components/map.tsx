@@ -2,7 +2,7 @@
 'use client';
 
 import type { Listing } from "@/lib/types";
-import { GoogleMap, LoadScript, MarkerF, InfoWindowF } from '@react-google-maps/api';
+import { GoogleMap, LoadScript, MarkerF, InfoWindowF, OverlayView } from '@react-google-maps/api';
 import { Card } from "@/components/ui/card";
 import { useState } from "react";
 import { generateSlug, formatPrice } from "@/lib/utils";
@@ -22,6 +22,11 @@ const center = {
   lat: 53.201,
   lng: 5.795
 };
+
+const getPixelPositionOffset = (width: number, height: number) => ({
+    x: -(width / 2),
+    y: -(height / 2),
+});
 
 export function MapView({ listings }: MapViewProps) {
     const router = useRouter();
@@ -74,28 +79,32 @@ export function MapView({ listings }: MapViewProps) {
                         }}
                     >
                         {listings.map((listing) => (
-                           <MarkerF
+                           <OverlayView
                                 key={listing.id}
                                 position={{ lat: listing.location.lat, lng: listing.location.lng }}
-                                onClick={() => handleMarkerClick(listing)}
-                                onMouseOver={() => handleMarkerMouseOver(listing.id)}
-                                onMouseOut={handleMarkerMouseOut}
-                                zIndex={activeMarker === listing.id ? 10 : 1}
-                            >
-                                {activeMarker === listing.id && (
-                                    <InfoWindowF
-                                        onCloseClick={handleMarkerMouseOut}
-                                        options={{
-                                            pixelOffset: new window.google.maps.Size(0, -35),
-                                            disableAutoPan: true,
-                                        }}
-                                    >
-                                        <div className="p-1">
-                                            <h4 className="font-bold text-sm mb-1">{listing.title}</h4>
+                                mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+                                getPixelPositionOffset={getPixelPositionOffset}
+                           >
+                               <button 
+                                    className="px-3 py-1 text-sm font-bold text-primary-foreground bg-primary rounded-full shadow-lg border-2 border-white transition-transform duration-200 ease-in-out hover:scale-110 focus:scale-110 focus:outline-none"
+                                    onClick={() => handleMarkerClick(listing)}
+                                    onMouseOver={() => handleMarkerMouseOver(listing.id)}
+                                    onMouseOut={handleMarkerMouseOut}
+                                    style={{
+                                        zIndex: activeMarker === listing.id ? 10 : 1,
+                                        transform: activeMarker === listing.id ? 'scale(1.1)' : 'scale(1)',
+                                    }}
+                               >
+                                    {formatPrice(listing.price)}
+                                    {activeMarker === listing.id && (
+                                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-xs">
+                                            <div className="bg-card text-card-foreground p-2 rounded-lg shadow-xl">
+                                                <h4 className="font-bold text-sm">{listing.title}</h4>
+                                            </div>
                                         </div>
-                                    </InfoWindowF>
-                                )}
-                            </MarkerF>
+                                    )}
+                               </button>
+                           </OverlayView>
                         ))}
                     </GoogleMap>
                 </LoadScript>
