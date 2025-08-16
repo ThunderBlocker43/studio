@@ -1,4 +1,4 @@
-import { Wifi, WashingMachine, Snowflake, ParkingSquare, Tv, Sofa, Wind, Sun, Flower, Utensils, Check, X, Building, Car, GitCommit, Waves, Elevator, Share2 } from 'lucide-react';
+import { Wifi, WashingMachine, Snowflake, ParkingSquare, Tv, Sofa, Wind, Sun, Flower, Utensils, Check, X, Building, Car, GitCommit, Waves, ArrowUpSquare, Share2 } from 'lucide-react';
 
 interface AmenityIconProps {
     amenity: string;
@@ -26,7 +26,7 @@ export const AmenityIcon = ({ amenity, className }: AmenityIconProps) => {
         case 'dishwasher':
             return <Waves className={className} />;
         case 'elevator':
-            return <Elevator className={className} />;
+            return <ArrowUpSquare className={className} />;
         case 'shared kitchen':
             return <Share2 className={className} />;
         default:
