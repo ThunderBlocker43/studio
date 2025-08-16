@@ -108,9 +108,9 @@ export function ListingCard({ listing, category, onCategoryLoaded }: ListingCard
             <span>{listing.details.area} m²</span>
           </div>
         </div>
-         <p className="text-xs text-muted-foreground italic flex-1">
+         <div className="text-xs text-muted-foreground italic flex-1">
             {isLoadingCategory ? <Skeleton className="h-8 w-full" /> : category?.reason}
-        </p>
+        </div>
       </CardContent>
       <CardFooter className="p-4 bg-secondary/30 flex justify-between items-center">
         <p className="text-xl font-bold text-primary">{formatPrice(listing.price)}<span className="text-sm font-normal text-muted-foreground">/month</span></p>
