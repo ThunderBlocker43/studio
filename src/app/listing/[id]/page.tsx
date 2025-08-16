@@ -1,17 +1,17 @@
-'use client';
-
 import { Header } from '@/components/header';
 import { allListings } from '@/data/listings';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Bath, BedDouble, Home, MapPin, Ruler } from 'lucide-react';
+import { Bath, BedDouble, MapPin, Ruler } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import React from 'react';
 
 export default function ListingPage({ params }: { params: { id: string } }) {
-  const listing = allListings.find(l => l.id === params.id);
+  const { id } = React.use(params);
+  const listing = allListings.find(l => l.id === id);
 
   if (!listing) {
     notFound();
