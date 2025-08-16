@@ -4,13 +4,17 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Bath, BedDouble, Dog, ExternalLink, MapPin, Ruler, Users } from 'lucide-react';
+import { 
+    Bath, BedDouble, Dog, ExternalLink, MapPin, Ruler, Users, 
+    Sofa, ClipboardSignature, Leaf, Wifi, WashingMachine, Snowflake, Check, X
+} from 'lucide-react';
 import { formatPrice, generateSlug } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import React from 'react';
 import { SingleListingMap } from '@/components/single-listing-map';
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
+import { AmenityIcon } from '@/components/amenity-icon';
 
 export default function ListingPage({ params }: { params: { id: string } }) {
   const { id } = React.use(params);
@@ -47,7 +51,7 @@ export default function ListingPage({ params }: { params: { id: string } }) {
                 </CardHeader>
                 <CardContent className="space-y-6">
                     <div>
-                        <h3 className="text-xl font-semibold mb-4">Details</h3>
+                        <h3 className="text-xl font-semibold mb-4">Key Details</h3>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-md text-foreground">
                             <div className="flex items-center gap-2" title={`${listing.details.bedrooms} bedrooms`}>
                                 <BedDouble className="h-5 w-5 text-muted-foreground" />
@@ -84,6 +88,32 @@ export default function ListingPage({ params }: { params: { id: string } }) {
                                     <span className="text-muted-foreground ml-1">couples</span>
                                 </div>
                             </div>
+                            <div className="flex items-center gap-2" title={`Furnishing: ${listing.details.furnishing}`}>
+                                <Sofa className="h-5 w-5 text-muted-foreground" />
+                                <span className='font-semibold capitalize'>{listing.details.furnishing}</span>
+                            </div>
+                             <div className="flex items-center gap-2" title={`Registration possible: ${listing.details.registrationPossible ? 'Yes' : 'No'}`}>
+                                <ClipboardSignature className="h-5 w-5 text-muted-foreground" />
+                                <span className='font-semibold'>{listing.details.registrationPossible ? 'Yes' : 'No'}</span>
+                            </div>
+                             <div className="flex items-center gap-2" title={`Energy Label: ${listing.details.energyLabel}`}>
+                                <Leaf className="h-5 w-5 text-muted-foreground" />
+                                <span className='font-semibold'>{listing.details.energyLabel}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div>
+                        <h3 className="text-xl font-semibold mb-4">Amenities</h3>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-md text-foreground">
+                            {listing.details.amenities.map(amenity => (
+                                <div key={amenity} className="flex items-center gap-2">
+                                    <AmenityIcon amenity={amenity} className="h-5 w-5 text-muted-foreground" />
+                                    <span className="capitalize">{amenity}</span>
+                                </div>
+                            ))}
                         </div>
                     </div>
                     

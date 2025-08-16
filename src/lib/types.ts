@@ -14,6 +14,10 @@ export type Listing = {
     area: number; 
     petsAllowed: boolean;
     couplesAllowed: boolean;
+    furnishing: 'furnished' | 'unfurnished' | 'semi-furnished';
+    registrationPossible: boolean;
+    energyLabel: 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'Unknown';
+    amenities: string[];
   };
   image: string;
   type: 'Apartment' | 'House' | 'Studio';
