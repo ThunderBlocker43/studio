@@ -1,3 +1,4 @@
+
 'use client';
 
 import type { CategorizeListingOutput } from '@/ai/flows/categorize-listing';
@@ -59,12 +60,13 @@ export function ListingGrid({ listings, filters, categories, onCategoryLoaded }:
     <div className="flex-1 px-6 pb-6">
        {filteredAndSortedListings.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
-            {filteredAndSortedListings.map(listing => (
+            {filteredAndSortedListings.map((listing, index) => (
             <ListingCard
                 key={listing.id}
                 listing={listing}
                 category={categories.get(listing.id) || null}
                 onCategoryLoaded={onCategoryLoaded}
+                index={index}
             />
             ))}
         </div>

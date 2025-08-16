@@ -1,3 +1,4 @@
+
 'use client';
 
 import { categorizeListing, type CategorizeListingOutput } from '@/ai/flows/categorize-listing';
@@ -17,6 +18,7 @@ interface ListingCardProps {
   listing: Listing;
   category: CategorizeListingOutput | null;
   onCategoryLoaded: (listingId: string, category: CategorizeListingOutput) => void;
+  index: number;
 }
 
 function SuitabilityBadge({ suitability }: { suitability: CategorizeListingOutput['suitability'] }) {
@@ -41,7 +43,7 @@ function SuitabilityBadge({ suitability }: { suitability: CategorizeListingOutpu
 }
 
 
-export function ListingCard({ listing, category, onCategoryLoaded }: ListingCardProps) {
+export function ListingCard({ listing, category, onCategoryLoaded, index }: ListingCardProps) {
   const { savedListingIds, toggleSaveListing } = useSavedListings();
   const [isLoadingCategory, setIsLoadingCategory] = useState(!category);
   const { toast } = useToast();
@@ -70,8 +72,13 @@ export function ListingCard({ listing, category, onCategoryLoaded }: ListingCard
         setIsLoadingCategory(false);
       }
     }
-    getCategory();
-  }, [listing.id, listing.title, listing.description, onCategoryLoaded, toast, category]);
+    
+    const timer = setTimeout(() => {
+      getCategory();
+    }, index * 500); // Stagger the API calls
+
+    return () => clearTimeout(timer);
+  }, [listing.id, listing.title, listing.description, onCategoryLoaded, toast, category, index]);
 
   return (
     <Card className="flex flex-col h-full overflow-hidden transition-all hover:shadow-lg">
