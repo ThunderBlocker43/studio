@@ -82,7 +82,7 @@ export function MapView({ listings }: MapViewProps) {
                            <OverlayView
                                 key={listing.id}
                                 position={{ lat: listing.location.lat, lng: listing.location.lng }}
-                                mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+                                mapPaneName={activeMarker === listing.id ? OverlayView.FLOAT_PANE : OverlayView.OVERLAY_MOUSE_TARGET}
                                 getPixelPositionOffset={getPixelPositionOffset}
                            >
                                <button 
@@ -91,7 +91,6 @@ export function MapView({ listings }: MapViewProps) {
                                     onMouseOver={() => handleMarkerMouseOver(listing.id)}
                                     onMouseOut={handleMarkerMouseOut}
                                     style={{
-                                        zIndex: activeMarker === listing.id ? 10 : 1,
                                         transform: activeMarker === listing.id ? 'scale(1.1)' : 'scale(1)',
                                     }}
                                >
