@@ -75,7 +75,7 @@ export function ListingCard({ listing, category, onCategoryLoaded, index }: List
     
     const timer = setTimeout(() => {
       getCategory();
-    }, index * 500); // Stagger the API calls
+    }, index * 4100); // Stagger the API calls to stay under the 15 req/min limit.
 
     return () => clearTimeout(timer);
   }, [listing.id, listing.title, listing.description, onCategoryLoaded, toast, category, index]);
