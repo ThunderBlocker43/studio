@@ -44,8 +44,14 @@ export default function ListingPage({ params }: { params: { id:string } }) {
              <Card>
                 <CardHeader>
                     <Badge variant="secondary" className="w-fit mb-2">{listing.type}</Badge>
-                    <CardTitle className="text-3xl font-headline">{listing.title}</CardTitle>
-                    <div className="flex items-center gap-2 text-lg text-muted-foreground">
+                    <div className="flex justify-between items-start">
+                      <CardTitle className="text-3xl font-headline flex-1 pr-4">{listing.title}</CardTitle>
+                      <div className="text-right shrink-0">
+                        <p className="text-3xl font-bold text-primary">{formatPrice(listing.price)}</p>
+                        <p className="text-sm font-normal text-muted-foreground">/month</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 text-lg text-muted-foreground pt-1">
                         <MapPin className="h-5 w-5 shrink-0" />
                         <span className="font-medium">{listing.location.address}</span>
                     </div>
