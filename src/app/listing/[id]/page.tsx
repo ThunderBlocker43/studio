@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
     Bath, BedDouble, Dog, ExternalLink, MapPin, Ruler, Users, 
-    Sofa, ClipboardSignature, Leaf, Wifi, WashingMachine, Snowflake, Check, X
+    Sofa, ClipboardSignature, Leaf, Wifi, WashingMachine, Snowflake, Check, X, PiggyBank, FileText
 } from 'lucide-react';
 import { formatPrice, generateSlug } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,7 @@ import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
 import { AmenityIcon } from '@/components/amenity-icon';
 
-export default function ListingPage({ params }: { params: { id: string } }) {
+export default function ListingPage({ params }: { params: { id:string } }) {
   const { id } = React.use(params);
   const listing = allListings.find(l => generateSlug(l.location.address) === id);
 
@@ -40,6 +40,12 @@ export default function ListingPage({ params }: { params: { id: string } }) {
                 data-ai-hint="apartment room"
                 />
             </Card>
+            
+            <div className='p-4 -mt-8 bg-background rounded-lg shadow-md mb-8 lg:hidden'>
+                 <p className="text-2xl font-bold text-primary">{formatPrice(listing.price)}</p>
+                 <p className="text-sm font-normal text-muted-foreground">/month (excl. utilities)</p>
+            </div>
+
              <Card>
                 <CardHeader>
                     <Badge variant="secondary" className="w-fit mb-2">{listing.type}</Badge>
@@ -129,22 +135,45 @@ export default function ListingPage({ params }: { params: { id: string } }) {
           </div>
           <div className="lg:col-span-1 space-y-8">
             <Card>
-                <CardContent className="p-6">
-                     <div className='flex justify-between items-center mb-6'>
-                        <div>
-                            <p className="text-2xl font-bold text-primary">{formatPrice(listing.price)}</p>
-                            <p className="text-sm font-normal text-muted-foreground">/month</p>
+                <CardContent className="p-6 space-y-4">
+                     <div className='hidden lg:block'>
+                        <p className="text-2xl font-bold text-primary">{formatPrice(listing.price)}</p>
+                        <p className="text-sm font-normal text-muted-foreground">/month</p>
+                    </div>
+                    <Separator className='hidden lg:block'/>
+                     <div className="space-y-3">
+                        <h4 className="font-semibold text-md">Additional Costs</h4>
+                        <div className='flex items-center justify-between text-sm'>
+                            <div className='flex items-center gap-2 text-muted-foreground'>
+                                <PiggyBank className="h-4 w-4"/>
+                                <span>Deposit</span>
+                            </div>
+                            <span className="font-medium text-foreground">
+                                {listing.details.deposit ? formatPrice(listing.details.deposit) : 'N/A'}
+                            </span>
                         </div>
-                         <Button size="lg" asChild>
+                        <div className='flex items-center justify-between text-sm'>
+                            <div className='flex items-center gap-2 text-muted-foreground'>
+                                <FileText className="h-4 w-4"/>
+                                <span>Administration Fee</span>
+                            </div>
+                             <span className="font-medium text-foreground">
+                                {listing.details.administrationFee ? formatPrice(listing.details.administrationFee) : 'None'}
+                            </span>
+                        </div>
+                     </div>
+                     <Separator />
+                     <div>
+                         <Button size="lg" asChild className='w-full'>
                             <Link href={listing.sourceUrl} target="_blank">
                                 View Original Listing
                                 <ExternalLink className="ml-2 h-4 w-4"/>
                             </Link>
                          </Button>
+                        <p className='text-xs text-muted-foreground mt-3 text-center'>
+                            This is an aggregated listing. View the original post to contact the landlord.
+                        </p>
                     </div>
-                    <p className='text-xs text-muted-foreground'>
-                        This is a listing aggregated from an external website. Click the button to view the original post and contact the landlord.
-                    </p>
                 </CardContent>
             </Card>
             <Card className='h-80'>

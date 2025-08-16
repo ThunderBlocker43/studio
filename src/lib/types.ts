@@ -18,6 +18,8 @@ export type Listing = {
     registrationPossible: boolean;
     energyLabel: 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'Unknown';
     amenities: string[];
+    deposit: number | null;
+    administrationFee: number | null;
   };
   image: string;
   type: 'Apartment' | 'House' | 'Studio';
