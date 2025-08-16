@@ -1,10 +1,11 @@
+
 'use client';
 
 import type { Listing } from "@/lib/types";
-import { GoogleMap, LoadScript, MarkerF } from '@react-google-maps/api';
+import { GoogleMap, LoadScript, MarkerF, InfoWindowF } from '@react-google-maps/api';
 import { Card } from "@/components/ui/card";
 import { useState } from "react";
-import { generateSlug } from "@/lib/utils";
+import { generateSlug, formatPrice } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 
 
@@ -26,8 +27,16 @@ export function MapView({ listings }: MapViewProps) {
     const router = useRouter();
     const [activeMarker, setActiveMarker] = useState<string | null>(null);
 
-    const handleMarkerClick = (listingId: string) => {
-        router.push(`/listing/${generateSlug(listings.find(l => l.id === listingId)!.location.address)}`);
+    const handleMarkerClick = (listing: Listing) => {
+        router.push(`/listing/${generateSlug(listing.location.address)}`);
+    };
+
+    const handleMarkerMouseOver = (listingId: string) => {
+        setActiveMarker(listingId);
+    };
+
+    const handleMarkerMouseOut = () => {
+        setActiveMarker(null);
     };
     
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
@@ -65,14 +74,28 @@ export function MapView({ listings }: MapViewProps) {
                         }}
                     >
                         {listings.map((listing) => (
-                            <MarkerF
+                           <MarkerF
                                 key={listing.id}
                                 position={{ lat: listing.location.lat, lng: listing.location.lng }}
-                                onClick={() => handleMarkerClick(listing.id)}
-                                onMouseOver={() => setActiveMarker(listing.id)}
-                                onMouseOut={() => setActiveMarker(null)}
+                                onClick={() => handleMarkerClick(listing)}
+                                onMouseOver={() => handleMarkerMouseOver(listing.id)}
+                                onMouseOut={handleMarkerMouseOut}
                                 zIndex={activeMarker === listing.id ? 10 : 1}
-                            />
+                            >
+                                {activeMarker === listing.id && (
+                                    <InfoWindowF
+                                        onCloseClick={handleMarkerMouseOut}
+                                        options={{
+                                            pixelOffset: new window.google.maps.Size(0, -35),
+                                            disableAutoPan: true,
+                                        }}
+                                    >
+                                        <div className="p-1">
+                                            <h4 className="font-bold text-sm mb-1">{listing.title}</h4>
+                                        </div>
+                                    </InfoWindowF>
+                                )}
+                            </MarkerF>
                         ))}
                     </GoogleMap>
                 </LoadScript>
