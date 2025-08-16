@@ -6,17 +6,18 @@ import { ListingCard } from '@/components/listing-card';
 import type { FiltersState, Listing } from '@/lib/types';
 import { getDistance } from '@/lib/utils';
 import { useMemo } from 'react';
+import { Skeleton } from './ui/skeleton';
 
 interface ListingGridProps {
   listings: Listing[];
   filters: FiltersState;
   categories: Map<string, CategorizeListingOutput>;
-  onCategoryLoaded: (listingId: string, category: CategorizeListingOutput) => void;
+  isLoadingCategories: boolean;
 }
 
 const SCHOOL_RADIUS_KM = 2.5;
 
-export function ListingGrid({ listings, filters, categories, onCategoryLoaded }: ListingGridProps) {
+export function ListingGrid({ listings, filters, categories, isLoadingCategories }: ListingGridProps) {
   const filteredAndSortedListings = useMemo(() => {
     let result = [...listings];
 
@@ -37,7 +38,7 @@ export function ListingGrid({ listings, filters, categories, onCategoryLoaded }:
     }
 
     // Filter by suitability
-    if (filters.suitability !== 'all') {
+    if (filters.suitability !== 'all' && !isLoadingCategories) {
       result = result.filter(l => {
         const category = categories.get(l.id);
         return category?.suitability === filters.suitability;
@@ -54,26 +55,34 @@ export function ListingGrid({ listings, filters, categories, onCategoryLoaded }:
     }
 
     return result;
-  }, [listings, filters, categories]);
+  }, [listings, filters, categories, isLoadingCategories]);
   
   return (
     <div className="flex-1 px-6 pb-6">
        {filteredAndSortedListings.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
-            {filteredAndSortedListings.map((listing, index) => (
+            {filteredAndSortedListings.map((listing) => (
             <ListingCard
                 key={listing.id}
                 listing={listing}
                 category={categories.get(listing.id) || null}
-                onCategoryLoaded={onCategoryLoaded}
-                index={index}
+                isLoading={isLoadingCategories}
             />
             ))}
         </div>
         ) : (
             <div className="flex flex-col items-center justify-center h-full text-center py-16">
-                <h3 className="text-xl font-semibold">No Listings Found</h3>
-                <p className="text-muted-foreground mt-2">Try adjusting your filters to find more homes.</p>
+                 {isLoadingCategories ? (
+                    <div className="space-y-2">
+                        <Skeleton className="h-6 w-48" />
+                        <Skeleton className="h-4 w-64" />
+                    </div>
+                ) : (
+                    <>
+                        <h3 className="text-xl font-semibold">No Listings Found</h3>
+                        <p className="text-muted-foreground mt-2">Try adjusting your filters to find more homes.</p>
+                    </>
+                )}
             </div>
         )}
     </div>

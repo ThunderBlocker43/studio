@@ -1,13 +1,14 @@
 'use client';
 
-import type { CategorizeListingOutput } from '@/ai/flows/categorize-listing';
+import { batchCategorizeListings, type CategorizeListingOutput } from '@/ai/flows/categorize-listing';
 import { Filters } from '@/components/filters';
 import { Header } from '@/components/header';
 import { ListingGrid } from '@/components/listing-grid';
 import { MapView } from '@/components/map';
 import { allListings } from '@/data/listings';
 import type { Listing, School, Suitability } from '@/lib/types';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 const minPrice = Math.min(...allListings.map(l => l.price));
 const maxPrice = Math.max(...allListings.map(l => l.price));
@@ -21,14 +22,34 @@ export default function Home() {
   });
 
   const [categories, setCategories] = useState<Map<string, CategorizeListingOutput>>(new Map());
+  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
+  const { toast } = useToast();
 
-  const handleCategoryLoaded = (listingId: string, category: CategorizeListingOutput) => {
-    setCategories(prev => {
-      const newMap = new Map(prev);
-      newMap.set(listingId, category);
-      return newMap;
-    });
-  };
+  useEffect(() => {
+    async function getCategories() {
+      try {
+        const listingInputs = allListings.map(l => ({ id: l.id, title: l.title, description: l.description }));
+        const results = await batchCategorizeListings({ listings: listingInputs });
+        
+        const newCategories = new Map<string, CategorizeListingOutput>();
+        results.categorizations.forEach(result => {
+          newCategories.set(result.id, { suitability: result.suitability, reason: result.reason });
+        });
+        setCategories(newCategories);
+      } catch (error) {
+        console.error("Failed to categorize listings", error);
+        toast({
+          title: "AI Error",
+          description: "Could not categorize listings.",
+          variant: "destructive"
+        })
+      } finally {
+        setIsLoadingCategories(false);
+      }
+    }
+    getCategories();
+  }, [toast]);
+
 
   return (
     <div className="flex flex-col h-screen">
@@ -60,7 +81,7 @@ export default function Home() {
             listings={allListings}
             filters={filters}
             categories={categories}
-            onCategoryLoaded={handleCategoryLoaded}
+            isLoadingCategories={isLoadingCategories}
           />
         </main>
       </div>

@@ -1,24 +1,21 @@
 
 'use client';
 
-import { categorizeListing, type CategorizeListingOutput } from '@/ai/flows/categorize-listing';
+import type { CategorizeListingOutput } from '@/ai/flows/categorize-listing';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSavedListings } from '@/hooks/use-saved-listings';
-import { useToast } from '@/hooks/use-toast';
 import type { Listing } from '@/lib/types';
 import { cn, formatPrice } from '@/lib/utils';
 import { Bath, BedDouble, Heart, Home, Info, MapPin, Ruler, University } from 'lucide-react';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
 
 interface ListingCardProps {
   listing: Listing;
   category: CategorizeListingOutput | null;
-  onCategoryLoaded: (listingId: string, category: CategorizeListingOutput) => void;
-  index: number;
+  isLoading: boolean;
 }
 
 function SuitabilityBadge({ suitability }: { suitability: CategorizeListingOutput['suitability'] }) {
@@ -43,42 +40,10 @@ function SuitabilityBadge({ suitability }: { suitability: CategorizeListingOutpu
 }
 
 
-export function ListingCard({ listing, category, onCategoryLoaded, index }: ListingCardProps) {
+export function ListingCard({ listing, category, isLoading }: ListingCardProps) {
   const { savedListingIds, toggleSaveListing } = useSavedListings();
-  const [isLoadingCategory, setIsLoadingCategory] = useState(!category);
-  const { toast } = useToast();
-
+  
   const isSaved = savedListingIds.has(listing.id);
-
-  useEffect(() => {
-    if (category) {
-      return;
-    }
-
-    async function getCategory() {
-      setIsLoadingCategory(true);
-      try {
-        const result = await categorizeListing({ title: listing.title, description: listing.description });
-        onCategoryLoaded(listing.id, result);
-      } catch (error) {
-        console.error("Failed to categorize listing", error);
-        toast({
-          title: "AI Error",
-          description: "Could not categorize one of the listings.",
-          variant: "destructive"
-        })
-        onCategoryLoaded(listing.id, { suitability: 'unsuitable', reason: 'Categorization failed.' });
-      } finally {
-        setIsLoadingCategory(false);
-      }
-    }
-    
-    const timer = setTimeout(() => {
-      getCategory();
-    }, index * 4100); // Stagger the API calls to stay under the 15 req/min limit.
-
-    return () => clearTimeout(timer);
-  }, [listing.id, listing.title, listing.description, onCategoryLoaded, toast, category, index]);
 
   return (
     <Card className="flex flex-col h-full overflow-hidden transition-all hover:shadow-lg">
@@ -94,7 +59,7 @@ export function ListingCard({ listing, category, onCategoryLoaded, index }: List
       </CardHeader>
       <CardContent className="p-4 flex-1 flex flex-col">
         <div className="flex justify-between items-start gap-2 mb-2">
-            {isLoadingCategory ? <Skeleton className="h-5 w-32" /> : category && <SuitabilityBadge suitability={category.suitability} />}
+            {isLoading ? <Skeleton className="h-5 w-32" /> : category && <SuitabilityBadge suitability={category.suitability} />}
         </div>
         <CardTitle className="text-lg font-headline font-semibold mb-1 leading-tight">{listing.title}</CardTitle>
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
@@ -116,7 +81,13 @@ export function ListingCard({ listing, category, onCategoryLoaded, index }: List
           </div>
         </div>
          <div className="text-xs text-muted-foreground italic flex-1">
-            {isLoadingCategory ? <Skeleton className="h-8 w-full" /> : category?.reason}
+            {isLoading ? (
+              <div className="space-y-1.5">
+                  <Skeleton className="h-2 w-full" />
+                  <Skeleton className="h-2 w-full" />
+                  <Skeleton className="h-2 w-5/6" />
+              </div>
+            ) : category?.reason}
         </div>
       </CardContent>
       <CardFooter className="p-4 bg-secondary/30 flex justify-between items-center">
