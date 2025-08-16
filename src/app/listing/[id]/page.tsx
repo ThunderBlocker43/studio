@@ -24,24 +24,6 @@ export default function ListingPage({ params }: { params: { id:string } }) {
     notFound();
   }
 
-  const PriceAndDeposit = () => (
-    <div className='space-y-2'>
-        <div>
-            <p className="text-2xl font-bold text-primary">{formatPrice(listing.price)}</p>
-            <p className="text-sm font-normal text-muted-foreground">/month (excl. utilities)</p>
-        </div>
-        {listing.details.deposit && (
-             <div className='flex items-center gap-2 text-sm'>
-                <PiggyBank className="h-4 w-4 text-muted-foreground"/>
-                <span className='text-muted-foreground'>Deposit:</span>
-                <span className="font-medium text-foreground">
-                    {formatPrice(listing.details.deposit)}
-                </span>
-            </div>
-        )}
-    </div>
-  );
-
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -58,10 +40,6 @@ export default function ListingPage({ params }: { params: { id:string } }) {
                 data-ai-hint="apartment room"
                 />
             </Card>
-            
-            <div className='p-4 -mt-8 bg-background rounded-lg shadow-md mb-8 lg:hidden'>
-                 <PriceAndDeposit />
-            </div>
 
              <Card>
                 <CardHeader>
@@ -153,10 +131,27 @@ export default function ListingPage({ params }: { params: { id:string } }) {
           <div className="lg:col-span-1 space-y-8">
             <Card>
                 <CardContent className="p-6 space-y-4">
-                     <div className='hidden lg:block'>
-                        <PriceAndDeposit />
-                    </div>
-                    <Separator className='hidden lg:block'/>
+                     <div className="space-y-3">
+                        <h4 className="font-semibold text-md">Price & Deposit</h4>
+                         <div className='space-y-2'>
+                            <div>
+                                <p className="text-2xl font-bold text-primary">{formatPrice(listing.price)}</p>
+                                <p className="text-sm font-normal text-muted-foreground">/month (excl. utilities)</p>
+                            </div>
+                            {listing.details.deposit && (
+                                <div className='flex items-center justify-between text-sm'>
+                                    <div className='flex items-center gap-2 text-muted-foreground'>
+                                        <PiggyBank className="h-4 w-4"/>
+                                        <span>Deposit</span>
+                                    </div>
+                                    <span className="font-medium text-foreground">
+                                        {formatPrice(listing.details.deposit)}
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+                     </div>
+                    <Separator/>
                      <div className="space-y-3">
                         <h4 className="font-semibold text-md">Additional Costs</h4>
                         <div className='flex items-center justify-between text-sm'>
